@@ -1,5 +1,7 @@
 FROM php:8.2-apache
 
+RUN ls -la /etc/apache2/mods-enabled/ | grep mpm
+
 # Forcefully clear ALL mpm symlinks and manually create only prefork
 RUN find /etc/apache2/mods-enabled/ -name 'mpm_*' -delete && \
     ln -s /etc/apache2/mods-available/mpm_prefork.conf /etc/apache2/mods-enabled/mpm_prefork.conf && \
@@ -19,6 +21,7 @@ COPY . /var/www/html/
 
 EXPOSE 80
 CMD ["apache2-foreground"]
+
 
 
 
