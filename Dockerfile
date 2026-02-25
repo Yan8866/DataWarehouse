@@ -1,8 +1,11 @@
-# Use official PHP + Apache image
 FROM php:8.2-apache
 
-# Fix: disable conflicting MPMs, keep only mpm_prefork (required for mod_php)
-RUN a2dismod mpm_event mpm_worker && a2enmod mpm_prefork
+# Force-remove conflicting MPM modules by deleting their symlinks directly
+RUN rm -f /etc/apache2/mods-enabled/mpm_event.conf \
+          /etc/apache2/mods-enabled/mpm_event.load \
+          /etc/apache2/mods-enabled/mpm_worker.conf \
+          /etc/apache2/mods-enabled/mpm_worker.load \
+    && a2enmod mpm_prefork
 
 # Install MySQL extensions
 RUN docker-php-ext-install mysqli pdo pdo_mysql
