@@ -1,11 +1,9 @@
 FROM php:8.2-apache
 
-# Force-remove conflicting MPM modules by deleting their symlinks directly
-RUN rm -f /etc/apache2/mods-enabled/mpm_event.conf \
-          /etc/apache2/mods-enabled/mpm_event.load \
-          /etc/apache2/mods-enabled/mpm_worker.conf \
-          /etc/apache2/mods-enabled/mpm_worker.load \
-    && a2enmod mpm_prefork
+# Forcefully clear ALL mpm symlinks and manually create only prefork
+RUN find /etc/apache2/mods-enabled/ -name 'mpm_*' -delete && \
+    ln -s /etc/apache2/mods-available/mpm_prefork.conf /etc/apache2/mods-enabled/mpm_prefork.conf && \
+    ln -s /etc/apache2/mods-available/mpm_prefork.load /etc/apache2/mods-enabled/mpm_prefork.load
 
 # Install MySQL extensions
 RUN docker-php-ext-install mysqli pdo pdo_mysql
@@ -21,6 +19,7 @@ COPY . /var/www/html/
 
 EXPOSE 80
 CMD ["apache2-foreground"]
+
 
 
 
